@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.IO;
-using Unity.Scripting.LifecycleManagement;
 using UnityEngine.UIElements;
 
 [CustomEditor(typeof(Readme))]
@@ -10,7 +9,7 @@ sealed partial class ReadmeEditor : Editor
     const string k_ShowedReadmeSessionStateName = "ReadmeEditor.showedReadme";
     const string k_ReadmeSourceDirectory = "Assets/TutorialInfo";
 
-    [OnCodeLoaded]
+    [InitializeOnLoadMethod]
     static void OnCodeLoaded()
         => EditorApplication.delayCall += SelectReadmeAutomatically;
 
@@ -25,14 +24,14 @@ sealed partial class ReadmeEditor : Editor
 
     static Readme SelectReadme()
     {
-        var ids = AssetDatabase.FindAssetGUIDs("Readme t:Readme");
+        var ids = AssetDatabase.FindAssets("Readme t:Readme");
         if (ids.Length != 1)
         {
             Debug.LogWarning("Couldn't find a readme");
             return null;
         }
 
-        var readmeObject = AssetDatabase.LoadAssetByGUID<Readme>(ids[0]);
+        var readmeObject = AssetDatabase.LoadAssetAtPath<Readme>(AssetDatabase.GUIDToAssetPath(ids[0]));
         Selection.activeObject = readmeObject;
         return readmeObject;
     }
